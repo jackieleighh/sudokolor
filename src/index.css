@@ -13,16 +13,22 @@ code {
 }
 
 .puzzleRow:nth-child(3n) {
-  margin-bottom: 10px;
+  margin-bottom: 7px;
 }
 
 .puzzleCell {
   display: inline-block;
-  width: calc((100% - 56px) / 9);
+  width: calc((100% - 50px) / 9);
+  margin-right: 5px;
+  margin-bottom: 1px;
 }
 
 .puzzleCell:nth-child(3n) {
   margin-right: 10px;
+}
+
+.puzzleCell.guess {
+  box-shadow: inset 0px 0px 0px 2px #000 !important;
 }
 
 .puzzleRow .puzzleCell:last-of-type {
