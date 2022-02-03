@@ -8,11 +8,11 @@ import ClearIcon from '@mui/icons-material/Clear';
 
 // TODO - add themes
 const COLOR_MAP = [
-  '#d40740',
-  '#db5e44',
-  '#c9a904',
-  '#179252',
-  '#68e869',
+  '#e34234', 
+  '#ff8c00',
+  '#f5c71a',
+  '#b2ec5d',
+  '#228b22',
   '#52c5df',
   '#0e57b0',
   '#7748d4',
