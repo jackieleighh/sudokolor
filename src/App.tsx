@@ -73,6 +73,10 @@ function App() {
       >
         <Grid item xs={3} style={{ maxWidth: '400px', width: '100%', padding: '0 10px' }}>
           <Grid container>
+            <Grid item xs={12} style={{ textAlign: 'center' }}>
+              <Typography variant="h5" display="block">sudokolor!</Typography>
+              <Typography variant="caption" display="block" gutterBottom>a color-based sudoku game</Typography>
+            </Grid>
             <Grid item xs={12}>
             {board && board.map((row, i) => (
               <div key={i} className="puzzleRow">
