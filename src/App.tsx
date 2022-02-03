@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { makePuzzle, pluck } from './utils';
-import { Grid, Button, ButtonGroup } from '@mui/material';
+import { Grid, Button, Typography } from '@mui/material';
 
 // TODO - add themes
 const COLOR_MAP = [
@@ -81,25 +81,31 @@ function App() {
                     className="puzzleCell" 
                     style={{ 
                       background: COLOR_MAP[cell - 1], 
-                      marginRight: j % 3 === 2 ? '10px' : '0px',
                       border: selected[0] === i && selected[1] === j ? '2px solid black' : '2px solid white'
                     }} 
                     onClick={() => handleSelectSquare(i, j)}
                     /> 
                 ))}
-                {i % 3 === 2 ? ( <div style={{ height: '10px' }} /> ) : null}
               </div>
             ))}
             </Grid>
             <Grid item xs={12}>
-            <ButtonGroup variant="contained">
+            <div className="colorButtonRow">
+              <Typography variant="overline" display="block">COLORS</Typography>
               {COLOR_MAP.map((c, i) => (
-                <Button key={i} style={{ background: c }} onClick={() => handlePutColor(i)} />
+                <button 
+                  key={i} 
+                  className="colorButton" 
+                  style={{ background: c }}
+                  onClick={() => handlePutColor(i)} 
+                />
               ))}
-              </ButtonGroup>
+              </div>
             </Grid>
             <Grid item xs={12}>
-              <Button onClick={() => generateGame()}>new game</Button>
+              <div className="controls">
+                <Button variant="contained" size="small" onClick={() => generateGame()}>new game</Button>
+              </div>
             </Grid>
           </Grid>
         </Grid>
