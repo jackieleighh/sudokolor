@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { makePuzzle, pluck } from './utils';
+import styled from 'styled-components';
 import { Grid, Button, Typography } from '@mui/material';
+import { makePuzzle, pluck } from './utils';
 
 // TODO - add themes
 const COLOR_MAP = [
@@ -104,7 +105,12 @@ function App() {
             </Grid>
             <Grid item xs={12}>
               <div className="controls">
-                <Button variant="contained" size="small" onClick={() => generateGame()}>new game</Button>
+                <ControlButton 
+                  variant="outlined" 
+                  onClick={() => generateGame()}
+                >
+                  new game
+                </ControlButton>
               </div>
             </Grid>
           </Grid>
@@ -112,5 +118,11 @@ function App() {
     </Grid>
   );
 }
+
+const ControlButton = styled(Button)`
+  padding: 5px 10px;
+  border-radius: 0;
+  font-size: 10px;
+`;
 
 export default App;
