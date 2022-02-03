@@ -12,10 +12,6 @@ code {
     monospace;
 }
 
-.puzzleRow {
-
-}
-
 .puzzleRow:nth-child(3n) {
   margin-bottom: 10px;
 }
@@ -48,9 +44,14 @@ code {
 .colorButton { 
   padding: 0;
   border-radius: 0;
-  width: calc((100% - 40px) / 9);
+  width: calc((100% - 45px) / 10);
   margin-right: 5px;
   border: none;
+}
+
+.colorButton.erase {
+  background: transparent;
+  position: relative;
 }
 
 .colorButton:last-of-type {

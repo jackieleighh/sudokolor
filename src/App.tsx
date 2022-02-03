@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import styled from 'styled-components';
-import { Grid, Button, Typography } from '@mui/material';
 import { makePuzzle, pluck } from './utils';
+
+// material
+import { styled } from '@mui/material/styles';
+import { Grid, Button, Typography } from '@mui/material';
+import ClearIcon from '@mui/icons-material/Clear';
 
 // TODO - add themes
 const COLOR_MAP = [
@@ -62,18 +65,28 @@ function App() {
     }
   };
 
+  const handleErase = () => {
+    const row = selected[0], col = selected[1];
+    if(!puzzle || !board || row < 0 || col < 0) return;
+    // check if part of puzzle
+    if(puzzle[row][col] === 0) {
+      // we can erase this
+      board[row][col] = -1;
+      setBoard([...board]);
+    }
+  }
+
   return (
-    <Grid
+    <ContainerGrid
         container
         spacing={0}
         direction="column"
         alignItems="center"
         justifyContent="center"
-        style={{ minHeight: '100vh' }}
       >
         <Grid item xs={3} style={{ maxWidth: '400px', width: '100%', padding: '0 10px' }}>
           <Grid container>
-            <Grid item xs={12} style={{ textAlign: 'center' }}>
+            <Grid item xs={12} style={{ textAlign: 'center', marginBottom: '10px' }}>
               <Typography variant="h5" display="block">sudokolor!</Typography>
               <Typography variant="caption" display="block" gutterBottom>a color-based sudoku game</Typography>
             </Grid>
@@ -105,28 +118,45 @@ function App() {
                   onClick={() => handlePutColor(i)} 
                 />
               ))}
+              <button className="colorButton erase" onClick={() => handleErase()}>
+                <StyledClearIcon />
+              </button>
               </div>
             </Grid>
             <Grid item xs={12}>
               <div className="controls">
-                <ControlButton 
-                  variant="outlined" 
-                  onClick={() => generateGame()}
-                >
+                <ControlButton variant="outlined" onClick={() => generateGame()}>
                   new game
                 </ControlButton>
               </div>
             </Grid>
           </Grid>
         </Grid>
-    </Grid>
+    </ContainerGrid>
   );
 }
 
-const ControlButton = styled(Button)`
-  padding: 5px 10px;
-  border-radius: 0;
-  font-size: 10px;
-`;
+const StyledClearIcon = styled(ClearIcon)(() => ({
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  marginRight: '-50%',
+  transform: 'translate(-48%, -50%)',
+  fontSize: '20px'
+}));
+
+const ContainerGrid = styled(Grid)(() => ({
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  marginRight: '-50%',
+  transform: 'translate(-50%, -50%)'
+}));
+
+const ControlButton = styled(Button)(() => ({
+  padding: '5px 10px',
+  fontSize: '10px',
+  borderRadius: '0',
+}));
 
 export default App;
