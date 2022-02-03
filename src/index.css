@@ -11,3 +11,18 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.puzzleRow {
+
+}
+
+.puzzleCell {
+  display: inline-block;
+  width: calc(9%);
+}
+
+.puzzleCell:before {
+  content: '';
+  display: block;
+  padding-top: 100%; /* ratio of 1:1 */
+}
