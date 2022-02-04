@@ -331,7 +331,11 @@ function App() {
             <Typography id="modal-modal-title" variant="h6">
               sudokolor!
             </Typography>
-            <Typography variant="caption" display="block" gutterBottom>a color-based sudoku game</Typography>
+            <Typography variant="caption" display="block" style={{ marginBottom: '20px' }}>a color-based sudoku game</Typography>
+            <Typography gutterBottom>
+              each color acts as 1-9 in a classic game of sudoku
+            </Typography>
+            <Typography>if you&apos;re not into rainbows, use the emoji version 😎</Typography>
           </div>
           <FormControl variant="standard" sx={{ m: 1 }} fullWidth>
             <InputLabel id="level-select-label">level</InputLabel>
@@ -357,8 +361,8 @@ function App() {
                   onChange={handleChangeToSymbols}
                   inputProps={{ 'aria-label': 'controlled' }}
                 />
-)}
-              label="use symbols"
+              )}
+              label="use emojis"
             />
           </FormControl>
           <div style={{ textAlign: 'center', marginTop: '10px' }}>
