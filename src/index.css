@@ -13,19 +13,19 @@ code {
 }
 
 .puzzleRow:nth-child(3n) {
-  margin-bottom: 7px;
+  margin-bottom: 12px;
 }
 
 .puzzleCell {
   display: inline-block;
   position: relative;
-  width: calc((100% - 50px) / 9);
+  width: calc((100% - 60px) / 9);
   margin-right: 5px;
   margin-bottom: 1px;
 }
 
 .puzzleCell:nth-child(3n) {
-  margin-right: 10px;
+  margin-right: 15px;
 }
 
 .puzzleCell.guess {
