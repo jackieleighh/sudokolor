@@ -297,7 +297,7 @@ function App() {
               label="Level"
               onChange={handleLevelChange}
             >
-              <MenuItem value={5}>easy</MenuItem>
+              <MenuItem value={20}>easy</MenuItem>
               <MenuItem value={30}>not too bad</MenuItem>
               <MenuItem value={40}>hard</MenuItem>
               <MenuItem value={50}>really hard</MenuItem>
