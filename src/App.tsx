@@ -241,7 +241,9 @@ function App() {
           </Grid>
           <Grid item xs={12}>
             <div className="colorButtonRow">
-              <Typography variant="overline" display="block">COLORS</Typography>
+              <Typography variant="overline" display="block">
+                {useSymbols ? 'EMOJIS' : 'COLORS'}
+              </Typography>
               {useSymbols ? SYMBOL_MAP.map((c, i) => (
                 <button
                   key={i}
