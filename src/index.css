@@ -78,7 +78,7 @@ code {
 }
 
 .colorButton.dimmed {
-  opacity: 0.3;
+  background: #D3D3D3 !important;
 }
 
 .colorButton.symbol.dimmed {
