@@ -41,6 +41,7 @@ function App() {
   const [startTime, setStartTime] = useState(0);
   const [useSymbols, setUseSymbols] = useState(false);
   const [colorCount, setColorCount] = useState<{[key: number]: number }>({});
+  const [newBestTime, setNewBestTime] = useState(-1);
 
   const checkSquares = () => {
     if (!board || !solution || !puzzle) return;
@@ -61,7 +62,17 @@ function App() {
     }
     setColorCount(newColorCount);
     setWrong(wrongCells);
-    if (correctCount === parseInt(level, 10)) setWon(true);
+    if (correctCount === parseInt(level, 10)) {
+      setWon(true);
+      const timeDiff = (Date.now() - startTime) / 1000;
+      const oldBestTime = localStorage.getItem('bestSudokolorTime');
+      if (!oldBestTime || parseInt(oldBestTime, 10) > timeDiff) {
+        localStorage.setItem('bestSudokolorTime', timeDiff.toString());
+        setNewBestTime(timeDiff);
+      } else {
+        setNewBestTime(-1);
+      }
+    }
   };
 
   const getWrongSquare = () => {
@@ -173,8 +184,8 @@ function App() {
     setUseSymbols(e.target.checked);
   };
 
-  const getElapsedTime = () => {
-    let timeDiff = (Date.now() - startTime) / 1000;
+  const formatTime = (time: number) => {
+    let timeDiff = time;
     const seconds = Math.floor(timeDiff % 60);
     timeDiff = Math.floor(timeDiff / 60);
     const minutes = timeDiff % 60;
@@ -183,12 +194,17 @@ function App() {
 
     let timeStr = '';
     if (hours > 0) {
-      timeStr += `${hours}:`;
+      timeStr += `${hours} hours, `;
     }
-    timeStr += `${minutes}:${seconds}`;
+    if (minutes > 0) {
+      timeStr += `${minutes} minutes and `;
+    }
+    timeStr += `${seconds} seconds`;
 
     return timeStr;
   };
+
+  const getElapsedTime = () => formatTime((Date.now() - startTime) / 1000);
 
   return (
     <ContainerGrid
@@ -374,13 +390,22 @@ function App() {
           <Typography id="modal-modal-title" variant="h6" gutterBottom>
             you won!!!!
           </Typography>
-          <Typography display="block">
+          <Typography display="block" gutterBottom>
             that puzzle took you
             {' '}
             {getElapsedTime()}
-            {' '}
-            seconds
           </Typography>
+          {newBestTime < 0 ? (
+            <Typography display="block">
+              best time:
+              {' '}
+              {formatTime(parseInt(localStorage.getItem('bestSudokolorTime') || '0', 10))}
+            </Typography>
+          ) : (
+            <Typography display="block">
+              wow!  that was your best time yet!
+            </Typography>
+          )}
           <div style={{ marginBottom: '10px', marginTop: '20px', textAlign: 'center' }}>
             <ControlButton variant="outlined" onClick={() => { handleWonModalClose(); handleNewGame(); }}>play again?</ControlButton>
           </div>
