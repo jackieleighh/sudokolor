@@ -14,11 +14,12 @@ import {
   MenuItem,
   SelectChangeEvent,
   IconButton,
+  FormControlLabel,
+  Switch,
 } from '@mui/material';
 import ClearIcon from '@mui/icons-material/Clear';
 import { makePuzzle, pluck } from './utils';
 
-// TODO - add themes
 // styles
 const COLOR_MAP = [
   '#e34234',
@@ -30,6 +31,18 @@ const COLOR_MAP = [
   '#0e57b0',
   '#7748d4',
   '#e00ac6',
+];
+
+const SYMBOL_MAP = [
+  '🔥',
+  '👽',
+  '🙃',
+  '💦',
+  '👅',
+  '👿',
+  '🌵',
+  '👻',
+  '🖤',
 ];
 
 const modalStyle = {
@@ -85,6 +98,7 @@ function App() {
   const [hint, setHint] = useState('');
   const [won, setWon] = useState(false);
   const [startTime, setStartTime] = useState(0);
+  const [useSymbols, setUseSymbols] = useState(false);
 
   const generateGame = () => {
     // make a puzzle solution
@@ -190,6 +204,10 @@ function App() {
     generateGame();
   };
 
+  const handleChangeToSymbols = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setUseSymbols(e.target.checked);
+  };
+
   const getElapsedTime = () => {
     let timeDiff = (Date.now() - startTime) / 1000;
     const seconds = Math.floor(timeDiff % 60);
@@ -228,6 +246,25 @@ function App() {
                 <div key={i} className="puzzleRow">
                   {row.map((cell: number, j: number) => {
                     cellNum += 1;
+                    if (useSymbols) {
+                      return (
+                        <div
+                          key={j}
+                          className={`puzzleCell symbol ${puzzle && puzzle[i][j] === 0 && board && board[i][j] !== 0 ? 'guess' : null}`}
+                          style={{
+                            boxShadow: selected[0] === i && selected[1] === j ? 'inset 0px 0px 0px 2px #000' : 'none',
+                          }}
+                          onClick={() => handleSelectSquare(i, j)}
+                          onKeyDown={(e) => handleSelectSquareKeyDown(e, i, j)}
+                          role="button"
+                          tabIndex={cellNum}
+                        >
+                          <div className="emoji">
+                            {cell > 0 ? SYMBOL_MAP[cell - 1] : null}
+                          </div>
+                        </div>
+                      );
+                    }
                     return (
                       <div
                         key={j}
@@ -250,7 +287,15 @@ function App() {
           <Grid item xs={12}>
             <div className="colorButtonRow">
               <Typography variant="overline" display="block">COLORS</Typography>
-              {COLOR_MAP.map((c, i) => (
+              {useSymbols ? SYMBOL_MAP.map((c, i) => (
+                <button
+                  key={i}
+                  className="colorButton symbol"
+                  onClick={() => handlePutColor(i)}
+                >
+                  <div className="emoji">{c}</div>
+                </button>
+              )) : COLOR_MAP.map((c, i) => (
                 <button
                   key={i}
                   className="colorButton"
@@ -303,6 +348,18 @@ function App() {
               <MenuItem value={50}>really hard</MenuItem>
               <MenuItem value={60}>almost impossible</MenuItem>
             </Select>
+          </FormControl>
+          <FormControl variant="standard" sx={{ m: 1 }} fullWidth>
+            <FormControlLabel
+              control={(
+                <Switch
+                  checked={useSymbols}
+                  onChange={handleChangeToSymbols}
+                  inputProps={{ 'aria-label': 'controlled' }}
+                />
+)}
+              label="use symbols"
+            />
           </FormControl>
           <div style={{ textAlign: 'center', marginTop: '10px' }}>
             <ControlButton variant="outlined" onClick={handleStartGame}>let&apos;s go</ControlButton>

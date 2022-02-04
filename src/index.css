@@ -18,6 +18,7 @@ code {
 
 .puzzleCell {
   display: inline-block;
+  position: relative;
   width: calc((100% - 50px) / 9);
   margin-right: 5px;
   margin-bottom: 1px;
@@ -29,6 +30,22 @@ code {
 
 .puzzleCell.guess {
   box-shadow: inset 0px 0px 0px 2px #000 !important;
+}
+
+.puzzleCell.symbol {
+  background: #D3D3D3;
+}
+
+.puzzleCell.symbol.guess {
+  box-shadow: inset 0px 0px 0px 1px #000 !important;
+}
+
+.emoji {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-right: -50%;
+  transform: translate(-48%, -50%);
 }
 
 .puzzleRow .puzzleCell:last-of-type {
@@ -53,6 +70,7 @@ code {
   width: calc((100% - 45px) / 10);
   margin-right: 5px;
   border: none;
+  position: relative;
 }
 
 .colorButton.erase {
