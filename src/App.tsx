@@ -27,6 +27,14 @@ import {
   CloseModalButton,
 } from './theme';
 
+const LEVELS: {[key: number]: string} = {
+  20: 'easy',
+  30: 'not too bad',
+  40: 'hard',
+  50: 'really hard',
+  60: 'almost impossible',
+};
+
 function App() {
   const [board, setBoard] = useState<number[][] | null>(null);
   const [puzzle, setPuzzle] = useState<number[][] | null>(null);
@@ -62,12 +70,16 @@ function App() {
     }
     setColorCount(newColorCount);
     setWrong(wrongCells);
+    // we won!
     if (correctCount === parseInt(level, 10)) {
       setWon(true);
       const timeDiff = (Date.now() - startTime) / 1000;
-      const oldBestTime = localStorage.getItem('bestSudokolorTime');
-      if (!oldBestTime || parseInt(oldBestTime, 10) > timeDiff) {
-        localStorage.setItem('bestSudokolorTime', timeDiff.toString());
+      const recordedTimes = JSON.parse(localStorage.getItem('bestSudokolorTimes') || '{}');
+      if ((Object.prototype.hasOwnProperty.call(recordedTimes, level)
+        && parseInt(recordedTimes[level], 10) > timeDiff)
+        || !Object.prototype.hasOwnProperty.call(recordedTimes, level)) {
+        recordedTimes[level] = timeDiff;
+        localStorage.setItem('bestSudokolorTimes', JSON.stringify(recordedTimes));
         setNewBestTime(timeDiff);
       } else {
         setNewBestTime(-1);
@@ -206,6 +218,14 @@ function App() {
 
   const getElapsedTime = () => formatTime((Date.now() - startTime) / 1000);
 
+  const getBestTime = () => {
+    const recordedTimes = JSON.parse(localStorage.getItem('bestSudokolorTimes') || '{}');
+    if (recordedTimes[level]) {
+      return formatTime(parseInt(recordedTimes[level], 10));
+    }
+    return '';
+  };
+
   return (
     <ContainerGrid
       container
@@ -273,19 +293,19 @@ function App() {
               {useSymbols ? SYMBOL_MAP.map((c, i) => (
                 <button
                   key={i}
-                  className={`colorButton symbol ${colorCount[i] === 9 ? 'dimmed' : ''}`}
+                  className={`colorButton symbol ${colorCount[i] === 9 && (level === '20' || level === '30') ? 'dimmed' : ''}`}
                   onClick={() => handlePutColor(i)}
-                  {...colorCount[i] === 9 ? { disabled: true } : null}
+                  {...colorCount[i] === 9 && (level === '20' || level === '30') ? { disabled: true } : null}
                 >
                   <div className="emoji">{c}</div>
                 </button>
               )) : COLOR_MAP.map((c, i) => (
                 <button
                   key={i}
-                  className={`colorButton ${colorCount[i] === 9 ? 'dimmed' : ''}`}
+                  className={`colorButton ${colorCount[i] === 9 && (level === '20' || level === '30') ? 'dimmed' : ''}`}
                   style={{ background: c }}
                   onClick={() => handlePutColor(i)}
-                  {...colorCount[i] === 9 ? { disabled: true } : null}
+                  {...colorCount[i] === 9 && (level === '20' || level === '30') ? { disabled: true } : null}
                 />
               ))}
               <button className="colorButton erase" onClick={handleErase}>
@@ -331,11 +351,11 @@ function App() {
               label="Level"
               onChange={handleLevelChange}
             >
-              <MenuItem value={20}>easy</MenuItem>
-              <MenuItem value={30}>not too bad</MenuItem>
-              <MenuItem value={40}>hard</MenuItem>
-              <MenuItem value={50}>really hard</MenuItem>
-              <MenuItem value={60}>almost impossible</MenuItem>
+              <MenuItem value={20}>{LEVELS[20]}</MenuItem>
+              <MenuItem value={30}>{LEVELS[30]}</MenuItem>
+              <MenuItem value={40}>{LEVELS[40]}</MenuItem>
+              <MenuItem value={50}>{LEVELS[50]}</MenuItem>
+              <MenuItem value={60}>{LEVELS[60]}</MenuItem>
             </Select>
           </FormControl>
           <FormControl variant="standard" sx={{ m: 1 }} fullWidth>
@@ -397,9 +417,12 @@ function App() {
           </Typography>
           {newBestTime < 0 ? (
             <Typography display="block">
-              best time:
+              best time at level
               {' '}
-              {formatTime(parseInt(localStorage.getItem('bestSudokolorTime') || '0', 10))}
+              {LEVELS[parseInt(level, 10)]}
+              :
+              {' '}
+              {getBestTime()}
             </Typography>
           ) : (
             <Typography display="block">
