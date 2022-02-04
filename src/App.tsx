@@ -37,7 +37,7 @@ const modalStyle = {
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: 400,
+  width: '80%',
   bgcolor: 'background.paper',
   border: '1px solid #000',
   boxShadow: 2,
@@ -83,6 +83,8 @@ function App() {
   const [helpModalOpen, setHelpModalOpen] = useState(false);
   const [level, setLevel] = useState('20');
   const [hint, setHint] = useState('');
+  const [won, setWon] = useState(false);
+  const [startTime, setStartTime] = useState(0);
 
   const generateGame = () => {
     // make a puzzle solution
@@ -102,6 +104,27 @@ function App() {
     }
   };
 
+  const checkSquares = () => {
+    if (!board || !solution || !puzzle) return;
+    const wrongCells = [];
+    let correctCount = 0;
+    for (let i = 0; i < board.length; i += 1) {
+      for (let j = 0; j < board[i].length; j += 1) {
+        if (board[i][j] !== 0 && board[i][j] !== solution[i][j]) wrongCells.push([i, j]);
+        else if (board[i][j] === solution[i][j] && puzzle[i][j] === 0) correctCount += 1;
+      }
+    }
+    setWrong(wrongCells);
+    if (correctCount === parseInt(level, 10)) setWon(true);
+  };
+
+  const getWrongSquare = () => {
+    if (!wrong || wrong.length === 0) return;
+    const wrongSquare = wrong[Math.floor(Math.random() * wrong.length)];
+    if (!wrongSquare) return;
+    setHint(`square at row ${wrongSquare[0] + 1}, column ${wrongSquare[1] + 1} is wrong.`);
+  };
+
   const handleSelectSquare = (i: number, j: number) => {
     // check if it is part of the puzzle
     if (puzzle && puzzle[i][j] > 0) return;
@@ -118,9 +141,10 @@ function App() {
     const row = selected[0]; const
       col = selected[1];
     if (!board || row < 0 || col < 0) return;
-    // congrats! you got a square
     board[row][col] = color + 1;
     setBoard([...board]);
+    // collect right and wrong squares
+    checkSquares();
   };
 
   const handleErase = () => {
@@ -144,20 +168,15 @@ function App() {
     setHelpModalOpen(false);
   };
 
+  const handleWonModalClose = () => {
+    setWon(false);
+  };
+
   const handleNewGame = () => {
     setGameModalOpen(true);
   };
 
   const handleHelpModalOpen = () => {
-    if (!board || !solution) return;
-    // get wrong values
-    const wrongCells = [];
-    for (let i = 0; i < board.length; i += 1) {
-      for (let j = 0; j < board[i].length; j += 1) {
-        if (board[i][j] !== 0 && board[i][j] !== solution[i][j]) wrongCells.push([i, j]);
-      }
-    }
-    setWrong(wrongCells);
     setHelpModalOpen(true);
   };
 
@@ -167,14 +186,25 @@ function App() {
 
   const handleStartGame = () => {
     setGameModalOpen(false);
+    setStartTime(Date.now());
     generateGame();
   };
 
-  const getWrongSquare = () => {
-    if (!wrong || wrong.length === 0) return;
-    const wrongSquare = wrong[Math.floor(Math.random() * wrong.length)];
-    if (!wrongSquare) return;
-    setHint(`square at row ${wrongSquare[0] + 1}, column ${wrongSquare[1] + 1} is wrong.`);
+  const getElapsedTime = () => {
+    let timeDiff = (Date.now() - startTime) / 1000;
+    const seconds = Math.floor(timeDiff % 60);
+    timeDiff = Math.floor(timeDiff / 60);
+    const minutes = timeDiff % 60;
+    timeDiff = Math.floor(timeDiff / 60);
+    const hours = timeDiff % 24;
+
+    let timeStr = '';
+    if (hours > 0) {
+      timeStr += `${hours}:`;
+    }
+    timeStr += `${minutes}:${seconds}`;
+
+    return timeStr;
   };
 
   return (
@@ -267,7 +297,7 @@ function App() {
               label="Level"
               onChange={handleLevelChange}
             >
-              <MenuItem value={20}>easy</MenuItem>
+              <MenuItem value={5}>easy</MenuItem>
               <MenuItem value={30}>not too bad</MenuItem>
               <MenuItem value={40}>hard</MenuItem>
               <MenuItem value={50}>really hard</MenuItem>
@@ -303,6 +333,29 @@ function App() {
               <ControlButton variant="outlined" onClick={getWrongSquare}>{hint.length > 0 ? 'another hint?' : 'need a hint?'}</ControlButton>
             </div>
           ) : null }
+        </Box>
+      </Modal>
+      <Modal
+        open={won}
+        onClose={handleWonModalClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={modalStyle}>
+          <CloseModalButton onClick={handleWonModalClose}><ClearIcon /></CloseModalButton>
+          <Typography id="modal-modal-title" variant="h6" gutterBottom>
+            you won!!!!
+          </Typography>
+          <Typography display="block">
+            that puzzle took you
+            {' '}
+            {getElapsedTime()}
+            {' '}
+            seconds
+          </Typography>
+          <div style={{ marginBottom: '10px', marginTop: '20px', textAlign: 'center' }}>
+            <ControlButton variant="outlined" onClick={() => { handleWonModalClose(); handleNewGame(); }}>play again?</ControlButton>
+          </div>
         </Box>
       </Modal>
     </ContainerGrid>
