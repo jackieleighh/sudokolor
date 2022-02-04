@@ -124,6 +124,8 @@ function App() {
       board[row][col] = 0;
       setBoard([...board]);
     }
+    // collect right and wrong squares
+    checkSquares();
   };
 
   const handleGameModalClose = () => {

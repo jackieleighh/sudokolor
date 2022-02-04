@@ -44,7 +44,7 @@ code {
   top: 50%;
   left: 50%;
   margin-right: -50%;
-  transform: translate(-48%, -50%);
+  transform: translate(-44%, -50%);
 }
 
 .puzzleRow .puzzleCell:last-of-type {
