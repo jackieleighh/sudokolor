@@ -19,9 +19,8 @@ code {
 .puzzleCell {
   display: inline-block;
   position: relative;
-  width: calc((100% - 60px) / 9);
-  margin-right: 5px;
-  margin-bottom: 1px;
+  width: calc((100% - 48px) / 9);
+  margin-right: 3px;
 }
 
 .puzzleCell:nth-child(3n) {

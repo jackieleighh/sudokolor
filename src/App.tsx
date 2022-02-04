@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 
 // material
-import { styled } from '@mui/material/styles';
 import {
   Grid,
-  Button,
   Typography,
   Modal,
   Box,
@@ -13,78 +11,21 @@ import {
   Select,
   MenuItem,
   SelectChangeEvent,
-  IconButton,
   FormControlLabel,
   Switch,
 } from '@mui/material';
 import ClearIcon from '@mui/icons-material/Clear';
 import { makePuzzle, pluck } from './utils';
-
-// styles
-const COLOR_MAP = [
-  '#e34234',
-  '#ff8c00',
-  '#f5c71a',
-  '#b2ec5d',
-  '#228b22',
-  '#52c5df',
-  '#0e57b0',
-  '#7748d4',
-  '#e00ac6',
-];
-
-const SYMBOL_MAP = [
-  '🔥',
-  '👽',
-  '🙃',
-  '💦',
-  '👅',
-  '👿',
-  '🌵',
-  '👻',
-  '🖤',
-];
-
-const modalStyle = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: '80%',
-  bgcolor: 'background.paper',
-  border: '1px solid #000',
-  boxShadow: 2,
-  p: 2,
-};
-
-const StyledClearIcon = styled(ClearIcon)(() => ({
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  marginRight: '-50%',
-  transform: 'translate(-48%, -50%)',
-  fontSize: '20px',
-}));
-
-const ContainerGrid = styled(Grid)(() => ({
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  marginRight: '-50%',
-  transform: 'translate(-50%, -50%)',
-}));
-
-const ControlButton = styled(Button)(() => ({
-  padding: '5px 10px',
-  fontSize: '10px',
-  borderRadius: '0',
-}));
-
-const CloseModalButton = styled(IconButton)(() => ({
-  position: 'absolute',
-  top: '5px',
-  right: '5px',
-}));
+import {
+  COLOR_MAP,
+  COLOR_NAMES,
+  SYMBOL_MAP,
+  modalStyle,
+  StyledClearIcon,
+  ContainerGrid,
+  ControlButton,
+  CloseModalButton,
+} from './theme';
 
 function App() {
   const [board, setBoard] = useState<number[][] | null>(null);
@@ -133,10 +74,22 @@ function App() {
   };
 
   const getWrongSquare = () => {
-    if (!wrong || wrong.length === 0) return;
-    const wrongSquare = wrong[Math.floor(Math.random() * wrong.length)];
-    if (!wrongSquare) return;
-    setHint(`square at row ${wrongSquare[0] + 1}, column ${wrongSquare[1] + 1} is wrong.`);
+    if (!board || !solution) return;
+    if (!wrong || wrong.length === 0) {
+      let row = Math.floor(Math.random() * 9);
+      let col = Math.floor(Math.random() * 9);
+      let missingSquare = board[row][col];
+      // get random square from solution that is not on board yet
+      while (missingSquare !== 0) {
+        row = Math.floor(Math.random() * 9);
+        col = Math.floor(Math.random() * 9);
+        missingSquare = board[row][col];
+      }
+      setHint(`square at row ${row + 1}, column ${col + 1} is ${COLOR_NAMES[solution[row][col] - 1]}.`);
+    } else {
+      const wrongSquare = wrong[Math.floor(Math.random() * wrong.length)];
+      setHint(`square at row ${wrongSquare[0] + 1}, column ${wrongSquare[1] + 1} is wrong.`);
+    }
   };
 
   const handleSelectSquare = (i: number, j: number) => {
@@ -168,7 +121,7 @@ function App() {
     // check if part of puzzle
     if (puzzle[row][col] === 0) {
       // we can erase this
-      board[row][col] = -1;
+      board[row][col] = 0;
       setBoard([...board]);
     }
   };
@@ -389,11 +342,9 @@ function App() {
           {hint.length > 0 ? (
             <Typography display="block" style={{ marginTop: '10px' }}>{hint}</Typography>
           ) : null}
-          {wrong && wrong.length > 0 ? (
-            <div style={{ marginBottom: '10px', marginTop: '20px', textAlign: 'center' }}>
-              <ControlButton variant="outlined" onClick={getWrongSquare}>{hint.length > 0 ? 'another hint?' : 'need a hint?'}</ControlButton>
-            </div>
-          ) : null }
+          <div style={{ marginBottom: '10px', marginTop: '20px', textAlign: 'center' }}>
+            <ControlButton variant="outlined" onClick={getWrongSquare}>{hint.length > 0 ? 'another hint?' : 'need a hint?'}</ControlButton>
+          </div>
         </Box>
       </Modal>
       <Modal
