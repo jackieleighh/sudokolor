@@ -13,6 +13,7 @@ import {
   Select,
   MenuItem,
   SelectChangeEvent,
+  IconButton,
 } from '@mui/material';
 import ClearIcon from '@mui/icons-material/Clear';
 import { makePuzzle, pluck } from './utils';
@@ -66,16 +67,23 @@ const ControlButton = styled(Button)(() => ({
   borderRadius: '0',
 }));
 
+const CloseModalButton = styled(IconButton)(() => ({
+  position: 'absolute',
+  top: '5px',
+  right: '5px',
+}));
+
 function App() {
   const [board, setBoard] = useState<number[][] | null>(null);
   const [puzzle, setPuzzle] = useState<number[][] | null>(null);
   const [solution, setSolution] = useState<number[][] | null>(null);
   const [selected, setSelected] = useState([-1, -1]);
-  const [wrong, setWrongCount] = useState(0);
-  const [modalOpen, setModalOpen] = useState(true);
+  const [wrong, setWrong] = useState<number[][]>();
+  const [gameModalOpen, setGameModalOpen] = useState(true);
+  const [helpModalOpen, setHelpModalOpen] = useState(false);
   const [level, setLevel] = useState('20');
+  const [hint, setHint] = useState('');
 
-  // TODO - use wrong somehow - hint reveals how many wrong/hightlights wrong square?
   const generateGame = () => {
     // make a puzzle solution
     const newSolution = makePuzzle();
@@ -83,8 +91,10 @@ function App() {
     setSelected([-1, -1]);
     if (newSolution) {
       setSolution(newSolution);
+      // copy to make solution immutable
+      const solutionCopy = newSolution.map((arr) => arr.slice());
       // pluck values from cells to create the game
-      const newBoard = pluck(newSolution, parseInt(level, 10));
+      const newBoard = pluck(solutionCopy, parseInt(level, 10));
       // copy so board changes do not update puzzle
       const newPuzzle = Array.from(newBoard).map((el) => Array.from(el));
       setPuzzle(newPuzzle);
@@ -107,13 +117,10 @@ function App() {
   const handlePutColor = (color: number) => {
     const row = selected[0]; const
       col = selected[1];
-    if (!solution || !board || row < 0 || col < 0) return;
+    if (!board || row < 0 || col < 0) return;
     // congrats! you got a square
     board[row][col] = color + 1;
     setBoard([...board]);
-    if (solution[row][col] !== (color + 1)) {
-      setWrongCount(wrong + 1);
-    }
   };
 
   const handleErase = () => {
@@ -128,8 +135,30 @@ function App() {
     }
   };
 
-  const handleModalClose = () => {
-    setModalOpen(false);
+  const handleGameModalClose = () => {
+    setGameModalOpen(false);
+  };
+
+  const handleHelpModalClose = () => {
+    setHint('');
+    setHelpModalOpen(false);
+  };
+
+  const handleNewGame = () => {
+    setGameModalOpen(true);
+  };
+
+  const handleHelpModalOpen = () => {
+    if (!board || !solution) return;
+    // get wrong values
+    const wrongCells = [];
+    for (let i = 0; i < board.length; i += 1) {
+      for (let j = 0; j < board[i].length; j += 1) {
+        if (board[i][j] !== 0 && board[i][j] !== solution[i][j]) wrongCells.push([i, j]);
+      }
+    }
+    setWrong(wrongCells);
+    setHelpModalOpen(true);
   };
 
   const handleLevelChange = (e: SelectChangeEvent<string>) => {
@@ -137,12 +166,15 @@ function App() {
   };
 
   const handleStartGame = () => {
-    setModalOpen(false);
+    setGameModalOpen(false);
     generateGame();
   };
 
-  const handleNewGame = () => {
-    setModalOpen(true);
+  const getWrongSquare = () => {
+    if (!wrong || wrong.length === 0) return;
+    const wrongSquare = wrong[Math.floor(Math.random() * wrong.length)];
+    if (!wrongSquare) return;
+    setHint(`square at row ${wrongSquare[0] + 1}, column ${wrongSquare[1] + 1} is wrong.`);
   };
 
   return (
@@ -203,6 +235,9 @@ function App() {
           </Grid>
           <Grid item xs={12}>
             <div className="controls">
+              <ControlButton style={{ marginRight: '10px' }} variant="outlined" onClick={handleHelpModalOpen}>
+                need help?
+              </ControlButton>
               <ControlButton variant="outlined" onClick={handleNewGame}>
                 new game
               </ControlButton>
@@ -211,8 +246,8 @@ function App() {
         </Grid>
       </Grid>
       <Modal
-        open={modalOpen}
-        onClose={handleModalClose}
+        open={gameModalOpen}
+        onClose={handleGameModalClose}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
@@ -223,27 +258,51 @@ function App() {
             </Typography>
             <Typography variant="caption" display="block" gutterBottom>a color-based sudoku game</Typography>
           </div>
-          <div>
-            <FormControl variant="standard" sx={{ m: 1 }} fullWidth>
-              <InputLabel id="level-select-label">level</InputLabel>
-              <Select
-                labelId="level-select-label"
-                id="level"
-                value={level}
-                label="Level"
-                onChange={handleLevelChange}
-              >
-                <MenuItem value={20}>easy</MenuItem>
-                <MenuItem value={30}>not too bad</MenuItem>
-                <MenuItem value={40}>hard</MenuItem>
-                <MenuItem value={50}>really hard</MenuItem>
-                <MenuItem value={60}>almost impossible</MenuItem>
-              </Select>
-            </FormControl>
-            <div style={{ textAlign: 'center', marginTop: '10px' }}>
-              <ControlButton variant="outlined" onClick={handleStartGame}>let&apos;s go</ControlButton>
-            </div>
+          <FormControl variant="standard" sx={{ m: 1 }} fullWidth>
+            <InputLabel id="level-select-label">level</InputLabel>
+            <Select
+              labelId="level-select-label"
+              id="level"
+              value={level}
+              label="Level"
+              onChange={handleLevelChange}
+            >
+              <MenuItem value={20}>easy</MenuItem>
+              <MenuItem value={30}>not too bad</MenuItem>
+              <MenuItem value={40}>hard</MenuItem>
+              <MenuItem value={50}>really hard</MenuItem>
+              <MenuItem value={60}>almost impossible</MenuItem>
+            </Select>
+          </FormControl>
+          <div style={{ textAlign: 'center', marginTop: '10px' }}>
+            <ControlButton variant="outlined" onClick={handleStartGame}>let&apos;s go</ControlButton>
           </div>
+        </Box>
+      </Modal>
+      <Modal
+        open={helpModalOpen}
+        onClose={handleHelpModalClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={modalStyle}>
+          <CloseModalButton onClick={handleHelpModalClose}><ClearIcon /></CloseModalButton>
+          <Typography id="modal-modal-title" variant="h6" gutterBottom>
+            need some help?
+          </Typography>
+          <Typography gutterBottom>
+            {wrong ? wrong.length : '0'}
+            {' '}
+            squares are wrong
+          </Typography>
+          {hint.length > 0 ? (
+            <Typography display="block" style={{ marginTop: '10px' }}>{hint}</Typography>
+          ) : null}
+          {wrong && wrong.length > 0 ? (
+            <div style={{ marginBottom: '10px', marginTop: '20px', textAlign: 'center' }}>
+              <ControlButton variant="outlined" onClick={getWrongSquare}>{hint.length > 0 ? 'another hint?' : 'need a hint?'}</ControlButton>
+            </div>
+          ) : null }
         </Box>
       </Modal>
     </ContainerGrid>
