@@ -77,6 +77,14 @@ code {
   position: relative;
 }
 
+.colorButton.dimmed {
+  opacity: 0.3;
+}
+
+.colorButton.symbol.dimmed {
+  opacity: 1;
+}
+
 .colorButton:last-of-type {
   margin-right: 0;
 }

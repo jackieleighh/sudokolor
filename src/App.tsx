@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 // material
 import {
@@ -40,35 +40,26 @@ function App() {
   const [won, setWon] = useState(false);
   const [startTime, setStartTime] = useState(0);
   const [useSymbols, setUseSymbols] = useState(false);
-
-  const generateGame = () => {
-    // make a puzzle solution
-    const newSolution = makePuzzle();
-    // reset selected
-    setSelected([-1, -1]);
-    if (newSolution) {
-      setSolution(newSolution);
-      // copy to make solution immutable
-      const solutionCopy = newSolution.map((arr) => arr.slice());
-      // pluck values from cells to create the game
-      const newBoard = pluck(solutionCopy, parseInt(level, 10));
-      // copy so board changes do not update puzzle
-      const newPuzzle = Array.from(newBoard).map((el) => Array.from(el));
-      setPuzzle(newPuzzle);
-      setBoard(newBoard);
-    }
-  };
+  const [colorCount, setColorCount] = useState<{[key: number]: number }>({});
 
   const checkSquares = () => {
     if (!board || !solution || !puzzle) return;
     const wrongCells = [];
     let correctCount = 0;
+    const newColorCount: {[key: number]: number } = {};
     for (let i = 0; i < board.length; i += 1) {
       for (let j = 0; j < board[i].length; j += 1) {
         if (board[i][j] !== 0 && board[i][j] !== solution[i][j]) wrongCells.push([i, j]);
         else if (board[i][j] === solution[i][j] && puzzle[i][j] === 0) correctCount += 1;
+        // get count of each for dimming buttons
+        if (Object.prototype.hasOwnProperty.call(newColorCount, board[i][j] - 1)) {
+          newColorCount[board[i][j] - 1] += 1;
+        } else {
+          newColorCount[board[i][j] - 1] = 1;
+        }
       }
     }
+    setColorCount(newColorCount);
     setWrong(wrongCells);
     if (correctCount === parseInt(level, 10)) setWon(true);
   };
@@ -92,6 +83,29 @@ function App() {
     }
   };
 
+  const generateGame = () => {
+    // make a puzzle solution
+    const newSolution = makePuzzle();
+    // reset selected
+    setSelected([-1, -1]);
+    if (newSolution) {
+      setSolution(newSolution);
+      // copy to make solution immutable
+      const solutionCopy = newSolution.map((arr) => arr.slice());
+      // pluck values from cells to create the game
+      const newBoard = pluck(solutionCopy, parseInt(level, 10));
+      // copy so board changes do not update puzzle
+      const newPuzzle = Array.from(newBoard).map((el) => Array.from(el));
+      setPuzzle(newPuzzle);
+      setBoard(newBoard);
+    }
+  };
+
+  useEffect(() => {
+    // check squares on each board update
+    checkSquares();
+  }, [board]);
+
   const handleSelectSquare = (i: number, j: number) => {
     // check if it is part of the puzzle
     if (puzzle && puzzle[i][j] > 0) return;
@@ -110,8 +124,6 @@ function App() {
     if (!board || row < 0 || col < 0) return;
     board[row][col] = color + 1;
     setBoard([...board]);
-    // collect right and wrong squares
-    checkSquares();
   };
 
   const handleErase = () => {
@@ -124,8 +136,6 @@ function App() {
       board[row][col] = 0;
       setBoard([...board]);
     }
-    // collect right and wrong squares
-    checkSquares();
   };
 
   const handleGameModalClose = () => {
@@ -247,17 +257,19 @@ function App() {
               {useSymbols ? SYMBOL_MAP.map((c, i) => (
                 <button
                   key={i}
-                  className="colorButton symbol"
+                  className={`colorButton symbol ${colorCount[i] === 9 ? 'dimmed' : ''}`}
                   onClick={() => handlePutColor(i)}
+                  {...colorCount[i] === 9 ? { disabled: true } : null}
                 >
                   <div className="emoji">{c}</div>
                 </button>
               )) : COLOR_MAP.map((c, i) => (
                 <button
                   key={i}
-                  className="colorButton"
+                  className={`colorButton ${colorCount[i] === 9 ? 'dimmed' : ''}`}
                   style={{ background: c }}
                   onClick={() => handlePutColor(i)}
+                  {...colorCount[i] === 9 ? { disabled: true } : null}
                 />
               ))}
               <button className="colorButton erase" onClick={handleErase}>

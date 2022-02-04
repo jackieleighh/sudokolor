@@ -36,6 +36,7 @@ module.exports = {
     ],
     'jsx-a11y/control-has-associated-label': 'off',
     'react/button-has-type': 'off',
+    'react/jsx-props-no-spreading': 'off',
   },
   settings: {
     'import/resolver': {
