@@ -44,7 +44,7 @@ code {
   top: 50%;
   left: 50%;
   margin-right: -50%;
-  transform: translate(-38%, -50%);
+  transform: translate(-44%, -50%);
 }
 
 .puzzleRow .puzzleCell:last-of-type {
@@ -87,7 +87,7 @@ code {
 }
 
 .colorButton.symbol.dimmed {
-  opacity: 1;
+  opacity: 0.3;
   background: #E8E8E8 !important;
 }
 
