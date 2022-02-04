@@ -32,7 +32,7 @@ code {
 }
 
 .puzzleCell.symbol {
-  background: #D3D3D3;
+  background: #E8E8E8;
 }
 
 .puzzleCell.symbol.guess {
@@ -44,7 +44,7 @@ code {
   top: 50%;
   left: 50%;
   margin-right: -50%;
-  transform: translate(-44%, -50%);
+  transform: translate(-38%, -50%);
 }
 
 .puzzleRow .puzzleCell:last-of-type {
@@ -70,6 +70,7 @@ code {
   margin-right: 5px;
   border: none;
   position: relative;
+  background: #D3D3D3;
 }
 
 .colorButton.erase {
@@ -81,8 +82,13 @@ code {
   background: #D3D3D3 !important;
 }
 
+.colorButton.symbol {
+  background: #E8E8E8;
+}
+
 .colorButton.symbol.dimmed {
   opacity: 1;
+  background: #E8E8E8 !important;
 }
 
 .colorButton:last-of-type {
